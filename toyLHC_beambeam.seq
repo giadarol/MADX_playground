@@ -1,0 +1,377 @@
+Beam, particle=proton, npart:=inten, energy=6500.0, exn=2.5e-6, eyn=2.5e-6;
+inten=0;
+
+n_cells_per_arc = 25;
+L_cell=100;
+n_cells_per_straight = 5;
+n_arcs=8;
+
+l16=L_cell/16.;
+l8=L_cell/8.;
+L_arc=L_cell*(n_cells_per_arc+n_cells_per_straight);
+
+circum=L_arc*n_arcs;
+
+ndip = n_arcs*(n_cells_per_arc-2)*6+3*n_arcs;
+mtoy: multipole, lrad=dummy, knl={2.0*pi/ndip};
+mb: mtoy;
+qftoy: multipole, lrad=dummy, knl:={0.,k2lf};
+qdtoy: multipole, lrad=dummy, knl:={0.,-k2ld};
+qfsttoy: multipole, lrad=dummy, knl:={0.,k2lf};
+qdsttoy: multipole, lrad=dummy, knl:={0.,-k2ld};
+qfRtoy: multipole, lrad=dummy, knl:={0.,k2lR1};
+qfLtoy: multipole, lrad=dummy, knl:={0.,k2lR1};
+qdRtoy: multipole, lrad=dummy, knl:={0.,-k2lR2};
+qdLtoy: multipole, lrad=dummy, knl:={0.,-k2lR2};
+qfR2toy: multipole, lrad=dummy, knl:={0.,k2lR5};
+qfL2toy: multipole, lrad=dummy, knl:={0.,k2lR5};
+qdR2toy: multipole, lrad=dummy, knl:={0.,-k2lR4};
+qdL2toy: multipole, lrad=dummy, knl:={0.,-k2lR4};
+qdR3toy: multipole, lrad=dummy, knl:={0.,-k2lR6};
+qdL3toy: multipole, lrad=dummy, knl:={0.,-k2lR6};
+qf:qftoy;
+qd:qdtoy;
+qfst:qfsttoy;
+qdst:qdsttoy;
+qfR: qfRtoy;
+qfL: qfLtoy;
+qdR: qdRtoy;
+qdL: qdLtoy;
+qfR2: qfR2toy;
+qfL2: qfL2toy;
+qdR2: qdR2toy;
+qdL2: qdL2toy;
+qdR3: qdR3toy;
+qdL3: qdL3toy;
+
+qf1toy: multipole, lrad=dummy, knl:={0.,k2lR3};
+qd1toy: multipole, lrad=dummy, knl:={0.,-k1};
+qf2toy: multipole, lrad=dummy, knl:={0.,k2};
+qd2toy: multipole, lrad=dummy, knl:={0.,-k3};
+qf3toy: multipole, lrad=dummy, knl:={0.,k4};
+qd3toy: multipole, lrad=dummy, knl:={0.,-kdown};
+qf4toy: multipole, lrad=dummy, knl:={0.,k4};
+qd4toy: multipole, lrad=dummy, knl:={0.,-k3};
+qf5toy: multipole, lrad=dummy, knl:={0.,k2};
+qd5toy: multipole, lrad=dummy, knl:={0.,-k1};
+
+qf1:qf1toy;
+qd1:qd1toy;
+qf2:qf2toy;
+qd2:qd2toy;
+qf3:qf3toy;
+qd3:qd3toy;
+qf4:qf4toy;
+qd4:qd4toy;
+qf5:qf5toy;
+qd5:qd5toy;
+
+kl_nom=2/L_cell*1.0001;
+k2l  =kl_nom;
+k2lf  =kl_nom;
+k2ld  =kl_nom;
+k2lst=kl_nom;
+k2lR1=kl_nom;
+k2lL1=kl_nom;
+k2lR2=kl_nom;
+k2lR3=kl_nom;
+k2lR4=kl_nom;
+k2lR5=kl_nom;
+k2lR6=kl_nom;
+k2lL2=kl_nom;
+
+kdown=1.00*kl_nom;
+k1     =1.*kl_nom;
+k2     =1.*kl_nom;
+k3     =1.*kl_nom;
+k4     =1.*kl_nom;
+
+sftoy: multipole, lrad=dummy, knl:={0.,0.,mf};
+sdtoy: multipole, lrad=dummy, knl:={0.,0.,-md};
+sf : sftoy;
+sd : sdtoy;
+mf=1.0e-1;
+md=1.0e-1;
+
+oftoy: multipole, lrad=dummy, knl:={0.,0.,0.,omf};
+odtoy: multipole, lrad=dummy, knl:={0.,0.,0.,-omd};
+of : oftoy;
+od : odtoy;
+omf=-1.0e-2;
+omd=-1.0e-2;
+
+rfc:rfcavity, L=0., volt:=10., harmon=30000,lag:=0.5;
+!bbtoy: beambeam,  width=5, sigx = 1.e-2, sigy = 1.e-2;
+sig=1.1577515656772496e-05;
+bbtoy: beambeam, charge=1, xma=0.00e-3, yma=0, sigx=sig, sigy=sig;
+bbtoyH: beambeam, charge=1, xma=3*sig, yma=0, sigx=sig, sigy=sig;
+bbtoyV: beambeam, charge=1, xma=0., yma=3*sig, sigx=sig, sigy=sig;
+bb: bbtoy;
+bbH: bbtoyH;
+bbV: bbtoyV;
+
+toymachine: sequence, refer=centre, l=circum;
+    arc=0;
+    while(arc < n_arcs)
+    {
+        ! bending section
+        n_cell = 0;
+        //    !dispersion suppression
+            qf1: qf1, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qdR: qdR, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+            qfR: qfR, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qdR2: qdR2, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+            qfR2: qfR2, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qdR3: qdR3, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+        while(n_cell < n_cells_per_arc-3)
+        {
+            qf: qf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qd: qd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+        }
+            if(arc==0)
+            {
+                left2: marker, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 ;
+            }
+            qf: qf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qdL3: qdL3, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+            qfL2: qfL2, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qdL2: qdL2, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+//            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+            if(arc==0)
+            {
+                left3: marker, at=arc*L_arc + n_cell*L_cell + 0*l8 ;
+            }
+            qfL: qfL, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            sf: sf, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            of: of, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 1*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 2*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 3*l8;
+            qdL: qdL, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            sd: sd, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            od: od, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 5*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 6*l8;
+            mb: mb, at=arc*L_arc + n_cell*L_cell + l16 + 7*l8;
+            n_cell = n_cell + 1;
+
+        ! straight section
+        if (arc == 0)
+        {
+                n_cell=0;
+                left: marker, at=arc*L_arc + n_cell*L_cell + n_cells_per_arc*L_cell;
+                qf1: qf1, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                qd1: qd1, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                n_cell = n_cell + 1;
+                qf2: qf2, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                qd2: qd2, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                n_cell = n_cell + 1;
+                qf3: qf3, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                qd3: qd3, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                ip: marker, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                bbpV1: bbV, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                bbpH1: bbH, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                bbp: bb, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                bbpH2: bbH, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                bbpV2: bbV, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                n_cell = n_cell + 1;
+                qf4: qf4, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                qd4: qd4, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                n_cell = n_cell + 1;
+                qf5: qf5, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                qd5: qd5, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                n_cell = n_cell + 1;
+        }
+        else
+        {
+            n_cell = 0;
+            //if(arc==1)
+            //{
+            //    left2: marker, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+            //}
+            while(n_cell < n_cells_per_straight)
+            {
+                if( n_cell==0 )
+                {
+                    qf1: qf1, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                }
+                else
+                {
+                    qfst: qfst, at=arc*L_arc + n_cell*L_cell + l16 + 0*l8 + n_cells_per_arc*L_cell;
+                }
+                if(arc==1)
+                {
+                    if(n_cell==2)
+                    {
+                        ip2: marker, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                        rfc: rfc, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                    }
+                }
+                    qdst: qdst, at=arc*L_arc + n_cell*L_cell + l16 + 4*l8 + n_cells_per_arc*L_cell;
+                n_cell = n_cell + 1;
+            }
+        }
+
+        arc = arc + 1;
+    }
+endsequence;
+
+!Beam, particle=proton, sequence=toymachine, npart = 1.e11, energy=6500.0;
+//Beam, particle=proton, sequence=toymachine, energy=6500.0;
+USE, sequence=toymachine;
+twiss;
+! match chromaticities
+match, sequence=toymachine;
+    global,sequence=toymachine, DQ1=0.;
+    global,sequence=toymachine, DQ2=0.;
+    vary,name=mf, step=0.0001;
+    vary,name=md, step=0.0001;
+    Lmdif, calls=1000, tolerance=1.0e-21;
+endmatch;
+////
+twiss,file="twiss.out";
+savebeta, label=bini_left, place=left, sequence=toymachine;
+savebeta, label=bini_left2, place=left2, sequence=toymachine;
+savebeta, label=bini_ip2, place=ip2, sequence=toymachine;
+//savebeta, label=bini_right, place=right;
+twiss;
+//show,bini_left;
+//show,bini_ip2;
+
+!disable central quadrupole and match waist
+kdown=0.00*28.28427125e-4;
+match,sequence=toymachine, range=left/ip,beta0=bini_left;
+vary,name=k1,step=0.00001;
+vary,name=k2,step=0.00001;
+vary,name=k3,step=0.00001;
+vary,name=k4,step=0.00001;
+vary,name=k2lR1,step=0.00001;
+vary,name=k2lR2,step=0.00001;
+constraint, range=ip, sequence=toymachine, betx=0.5, bety=0.5,alfx=0,alfy=0,dx=0.,dpx=0.;
+lmdif, calls=1000, tolerance=1.e-21;
+endmatch;
+
+//twiss;
+! match fractional tune
+
+match, sequence=toymachine;
+    global,sequence=toymachine, Q1=41.28;
+    global,sequence=toymachine, Q2=40.31;
+    vary,name=k2lf, step=0.0000001;
+    vary,name=k2ld, step=0.0000001;
+    vary,name=k2lR4,step=0.00001;
+    vary,name=k2lR5,step=0.00001;
+    constraint, range=ip,sequence=toymachine,dx=0.,dpx=0.;
+    Lmdif, calls=1000, tolerance=1.0e-21;
+endmatch;
+
+twiss,file="twiss.out";
+//stop;
+! re-match chromaticities
+match, sequence=toymachine;
+    global,sequence=toymachine, DQ1=+1.;
+    global,sequence=toymachine, DQ2=+1.;
+    vary,name=mf, step=0.0001;
+    vary,name=md, step=0.0001;
+    Lmdif, calls=1000, tolerance=1.0e-21;
+endmatch;
+
+//mf=0;
+//md=0;
+//omf=0;
+//omd=0;
+
+save, sequence = toymachine, file=toy.seq;
+stop;
+
+inten = 1e11;
+twiss,file="tracks001/twiss.out";
+use,sequence=toymachine;
+Beam, particle=proton, npart:=inten, energy=6500.0, exn=2.5e-6, eyn=2.5e-6;
+
+
+//stop;
+! tracking
+stepx = 1e-5;
+stepy = 1e-5;
+track, file=tracks001/track;
+nx = 1;
+while( nx < 21 )
+{
+    ny = 1;
+    while( ny < 21 )
+    {
+        start, x=+nx*stepx, y=+ny*stepy, px=0, py=0, pt=0*5.e-4;
+        ny = ny + 1;
+    }
+    nx = nx+1;
+}
+run,turns=150;
+endtrack;
+
+stop;
