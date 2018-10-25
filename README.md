@@ -10,11 +10,11 @@ needs
 (NAFFlib and tune_diagram are assumed to be included in PYTHONPATH)
 
 First run 
-```madx < toyLHC_beambeam.seq```
+```madx < toyLHC_beambeam.seq```  
 which creates and saves the ```toy.seq``` MAD-X sequence file,
 where ```madx``` is the MAD-X executable.
 
 Running
-```python plot_tunes.py```
+```python plot_tunes.py```  
 will import the mad-x sequence, create an grid of $x-y$ points and uses it to track particles with MAD-X.
 Finally, it reads the tfs files and produces the footprint.
