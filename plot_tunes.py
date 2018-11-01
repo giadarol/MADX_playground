@@ -9,11 +9,7 @@ import math
 import sys
 import tune_diagram
 import footprint
-
-if sys.version_info[0] < 3:
-    import NAFFlib2 as NAFFlib
-else:
-    import NAFFlib
+import NAFFlib
 
 plt.style.use('kostas')
 
