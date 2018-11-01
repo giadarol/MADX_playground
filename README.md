@@ -1,6 +1,6 @@
 # MADX_playground
 
-needs
+Requirements:
 * Python 2
 * [MAD-X](http://mad.web.cern.ch/mad/)
 * [NAFFLib](https://github.com/kparasch/NAFFlib)
